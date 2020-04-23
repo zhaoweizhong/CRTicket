@@ -1,0 +1,11 @@
+FROM php:7.3.12-fpm-alpine
+
+# 修改镜像源
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+
+RUN apk add m4 autoconf make gcc g++ linux-headers libc-dev git libzip-dev libpng-dev \
+    && docker-php-ext-install zip gd mysqli pdo pdo_mysql mysqli \
+    && pecl install -o -f swoole redis \
+    && docker-php-ext-enable swoole redis
+
+CMD ["php","-m"]
