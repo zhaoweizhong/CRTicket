@@ -13,7 +13,7 @@ services:
       - /Users/zzw/Courses/Database/Project:/var/www:cached
       - /Users/zzw/Docker Configs/crticket_logs:/var/log/nginx:cached
     networks:
-      - webnet
+      - crticket-webnet
   crticket-php:
     container_name: "crticket-php"
     build:
@@ -26,20 +26,20 @@ services:
     ports:
       - "5201:5201"
     volumes:
-      - /Users/zzw/Websites/Mengtu-Backend:/var/www:cached
+      - /Users/zzw/Courses/Database/Project:/var/www:cached
+    networks:
+      - crticket-webnet
+  crticket-redis:
+    container_name: "crticket-redis"
+    image: redis:5.0.8-alpine
+    restart: always
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - /Users/zzw/Docker Configs/redis/data:/data:cached
     networks:
       - webnet
-  # crticket-redis:
-  #   container_name: "crticket-redis"
-  #   image: redis:5.0.8-alpine
-  #   restart: always
-  #   command: redis-server --appendonly yes
-  #   ports:
-  #     - "6379:6379"
-  #   volumes:
-  #     - /Users/zzw/Docker Configs/redis/data:/data:cached
-  #   networks:
-  #     - webnet
 networks:
   crticket-webnet:
     driver: bridge
