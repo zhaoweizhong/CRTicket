@@ -1,0 +1,45 @@
+version: "2"
+services:
+  crticket-nginx:
+    container_name: "crticket-nginx"
+    image: nginx:1.17.6-alpine
+    restart: always
+    depends_on:
+      - "crticket-php"
+    ports:
+      - "80:80"
+    volumes:
+      - /Users/zzw/Courses/Database/Project/docker:/etc/nginx/conf.d:cached
+      - /Users/zzw/Courses/Database/Project:/var/www:cached
+      - /Users/zzw/Docker Configs/crticket_logs:/var/log/nginx:cached
+    networks:
+      - webnet
+  crticket-php:
+    container_name: "crticket-php"
+    build:
+      context: .
+      dockerfile: Dockerfile-php
+    restart: always
+    depends_on:
+      - "crticket-redis"
+    command: /usr/local/bin/php /var/www/bin/laravels start -i
+    ports:
+      - "5201:5201"
+    volumes:
+      - /Users/zzw/Websites/Mengtu-Backend:/var/www:cached
+    networks:
+      - webnet
+  # crticket-redis:
+  #   container_name: "crticket-redis"
+  #   image: redis:5.0.8-alpine
+  #   restart: always
+  #   command: redis-server --appendonly yes
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - /Users/zzw/Docker Configs/redis/data:/data:cached
+  #   networks:
+  #     - webnet
+networks:
+  crticket-webnet:
+    driver: bridge
