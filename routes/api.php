@@ -31,4 +31,6 @@ Route::middleware('auth:api')->group(function() {
     Route::get('/user', 'UsersController@me');
     // 获取某用户信息 - 管理员权限
     Route::get('/users/{user}', 'UsersController@show');
+    // 编辑用户信息
+    Route::patch('/users/{user}', 'UsersController@update');
 });
