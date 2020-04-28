@@ -15,7 +15,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return 'CR Ticket API';
+    return response()->json([
+        'message' => 'Welcome to CR Ticket API.',
+        'status_code' => 200
+    ]);
 });
 
 // 登录
