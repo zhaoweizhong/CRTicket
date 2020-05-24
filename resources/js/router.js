@@ -19,7 +19,28 @@ const routes = [
             {
                 path: '/login',
                 component: Login
+            },
+            {
+                path: '/book',
+                component: Login
+            },
+            {
+                path: '/order',
+                component: Login
+            },
+            {
+                path: '/admin/train',
+                component: Login
+            },
+            {
+                path: '/admin/order',
+                component: Login
+            },
+            {
+                path: '/admin/user',
+                component: Login
             }
+            
         ]
     },
 ]
