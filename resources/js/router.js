@@ -1,9 +1,17 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import {getCookie} from 'tiny-cookie'
+import store from "./store";
 
 import PageLayout from './layouts/PageLayout';
 import Home from './pages/Home'
 import Login from './pages/Login'
+import Book from './pages/Book'
+import Order from './pages/Order'
+import AdminTrain from './pages/admin/Train'
+import AdminOrder from './pages/admin/Order'
+import AdminUser from './pages/admin/User'
+import ErrorPage from './pages/Error'
 
 Vue.use(VueRouter);
 
@@ -18,29 +26,58 @@ const routes = [
             },
             {
                 path: '/login',
-                component: Login
+                component: Login,
+                meta: {
+                    requiresNoAuth: true
+                },
             },
             {
                 path: '/book',
-                component: Login
+                component: Book,
+                meta: {
+                    requiresAuth: true
+                },
             },
             {
                 path: '/order',
-                component: Login
+                component: Order,
+                meta: {
+                    requiresAuth: true
+                },
             },
             {
                 path: '/admin/train',
-                component: Login
+                component: AdminTrain,
+                meta: {
+                    requiresAuth: true,
+                    requiresAdmin: true
+                },
             },
             {
                 path: '/admin/order',
-                component: Login
+                component: AdminOrder,
+                meta: {
+                    requiresAuth: true,
+                    requiresAdmin: true
+                },
             },
             {
                 path: '/admin/user',
-                component: Login
+                component: AdminUser,
+                meta: {
+                    requiresAuth: true,
+                    requiresAdmin: true
+                },
+            },
+            {
+                path: '/error',
+                component: ErrorPage
             }
-            
+            ,
+            {
+                path: '/*',
+                component: ErrorPage
+            }
         ]
     },
 ]
@@ -51,6 +88,35 @@ const router = new VueRouter({
     routes
 })
 
-
+router.beforeEach((to, from, next) => {
+    if ((store.state.account.isLogin || store.state.account.user) && getCookie('token') == null) {
+        store.commit('account/logout')
+    } else if ((!store.state.account.isLogin || !store.state.account.user) && getCookie('token')) {
+        store.commit('account/login', getCookie('token'))
+    }
+    if (to.meta.requiresAuth) {
+        //需要认证
+        if (getCookie('token') == null) {
+            store.commit('account/logout')
+            next('/login');
+        } else if ((!store.state.account.isLogin || !store.state.account.user) && getCookie('token')) {
+            store.commit('account/login', getCookie('token'))
+            if (to.meta.requiresAdmin && store.state.account.user.type != 'admin') {
+                next('/error');
+            } else {
+                next();
+            }
+        }
+    } else if (to.meta.requiresNoAuth) {
+        //需要不认证
+        if (!store.state.account.isLogin) {
+            next();
+        } else {
+            next('/');
+        }
+    } else {
+        next();
+    }
+  })
 
 export default router

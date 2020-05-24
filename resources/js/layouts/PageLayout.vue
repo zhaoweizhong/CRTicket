@@ -3,23 +3,29 @@
         <el-container class="sider">
             <el-aside width="250px">
                 <el-menu :default-active.sync="activeItem" @select="handleNavSelect">
-                    <img src="images/logo.png" alt="" class="logo">
-                    <div class="user">
+                    <img src="images/logo.png" class="logo">
+                    <div class="user" v-if="!$store.state.account.isLogin">
                         <p>欢迎，请登录</p>
                         <el-button type="success" size="mini" @click="router.push('/login')">登录</el-button>
+                    </div>
+                    <div class="user" v-else>
+                        <p>欢迎，{{$store.state.account.user.username}}<el-tag v-if="$store.state.account.user.type == 'admin'" type="success" size="mini">管理员</el-tag></p>
+                        <el-button type="danger" size="mini" @click="handleLogout">退出</el-button>
                     </div>
                     <el-divider></el-divider>
                     <el-menu-item index="0"><i class="fad fa-subway"></i>列车查询</el-menu-item>
                     <el-menu-item index="1"><i class="fad fa-credit-card-front"></i>车票预订</el-menu-item>
                     <el-menu-item index="2"><i class="fad fa-shopping-bag"></i>订单管理</el-menu-item>
-                    <el-submenu index="-1">
+                    <el-submenu index="-1" v-if="$store.state.account.isLogin && $store.state.account.user.type == 'admin'">
                         <template slot="title"><i class="fas fa-user-shield"></i>管理员</template>
                         <el-menu-item index="3"><i class="fad fa-subway"></i>车次管理</el-menu-item>
                         <el-menu-item index="4"><i class="fad fa-credit-card-front"></i>订单管理</el-menu-item>
                         <el-menu-item index="5"><i class="fas fa-user-cog"></i>用户管理</el-menu-item>
                     </el-submenu>
                     <div class="bottom">
-                        <a href="https://github.com/zhaoweizhong/CRTicket" target="_blank"><i class="fab fa-github"></i></a>
+                        <el-tooltip class="item" effect="dark" content="本项目 GitHub 仓库" placement="top">
+                            <a href="https://github.com/zhaoweizhong/CRTicket" target="_blank"><i class="fab fa-github"></i></a>
+                        </el-tooltip>
                         <p style="margin-top: 3px;"><i class="far fa-copyright"></i>2020 Some rights reserved.</p>
                         <p>Licensed under the MIT License.</p>
                     </div>
@@ -28,8 +34,10 @@
         </el-container>
         <el-container class="body">
             <el-card class="body-card" shadow="hover">
+                <span v-if="title == '列车查询'" slot="header" class="el-page-header__content">列车查询</span>
+                <el-page-header v-else slot="header" @back="router.go(-1)" :content="title"></el-page-header>
                 <transition name="page-toggle">
-                    <router-view ref="page" />
+                    <router-view ref="page" @getTitle="getTitle"/>
                 </transition>
             </el-card>
         </el-container>
@@ -42,6 +50,7 @@ export default {
     data() {
         return {
             activeItem: '',
+            title: ''
         }
     },
     watch: {
@@ -53,6 +62,9 @@ export default {
         this.changeActiveItem(this.$router.currentRoute.path)
     },
     methods: {
+        getTitle(title) {
+            this.title = title
+        },
         changeActiveItem(path) {
             if (path == "/") {
                 this.activeItem = "0"
@@ -91,6 +103,14 @@ export default {
                     this.router.push('/admin/user')
                     break;
             }
+        },
+        handleLogout() {
+            this.$store.commit('account/logout')
+            this.$message({
+                showClose: true,
+                message: '退出成功',
+                type: 'success'
+            });
         }
     }
 }
@@ -126,6 +146,9 @@ export default {
         font-size: 14px;
         p {
             margin: 7px 0;
+            .el-tag {
+                margin-left: 5px;
+            }
         }
     }
     .el-divider {
@@ -164,6 +187,7 @@ export default {
 .body-card {
     margin: auto;
     height: 75%;
+    overflow-y: overlay;
 }
 
 .el-menu-item,
@@ -200,4 +224,42 @@ export default {
         width: 1080px;
     }
 }
+</style>
+<style lang="less">
+    .body-card {
+        .el-card__header {
+            position: fixed;
+            background-color: #FFFFFF;
+            z-index: 1000;
+            border-radius: 4px;
+        }
+        @media only screen and (max-width: 768px) {
+            .el-card__header {
+                width: 480px;
+            }
+        }
+        @media only screen and (min-width: 768px) {
+            .el-card__header {
+                width: 480px;
+            }
+        }
+        @media only screen and (min-width: 992px) {
+            .el-card__header {
+                width: 600px;
+            }
+        }
+        @media only screen and (min-width: 1200px) {
+            .el-card__header {
+                width: 800px;
+            }
+        }
+        @media only screen and (min-width: 1600px) {
+            .el-card__header {
+                width: 1080px;
+            }
+        }
+        .el-card__body {
+            margin-top: 61px;
+        }
+    }
 </style>

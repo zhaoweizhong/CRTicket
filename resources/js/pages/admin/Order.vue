@@ -4,12 +4,13 @@
 
 <script>
 export default {
-    name: 'Home',
+    name: 'Order',
     created() {
-        this.$emit('getTitle', '列车查询')
+        this.$emit('getTitle', '订单管理');
     },
 }
 </script>
 
-<style lang="less" scoped>
+<style>
+
 </style>

@@ -4,12 +4,13 @@
 
 <script>
 export default {
-    name: 'Home',
+    name: 'Error',
     created() {
-        this.$emit('getTitle', '列车查询')
+        this.$emit('getTitle', '错误');
     },
 }
 </script>
 
-<style lang="less" scoped>
+<style>
+
 </style>
