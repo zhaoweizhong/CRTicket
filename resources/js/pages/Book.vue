@@ -4,12 +4,13 @@
 
 <script>
 export default {
-    name: 'Home',
+    name: 'Book',
     created() {
-        this.$emit('getTitle', '列车查询')
+        this.$emit('getTitle', '车票预订');
     },
 }
 </script>
 
-<style lang="less" scoped>
+<style>
+
 </style>
