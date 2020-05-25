@@ -6,6 +6,7 @@ import store from "./store";
 import PageLayout from './layouts/PageLayout';
 import Home from './pages/Home'
 import Login from './pages/Login'
+import Passenger from './pages/Passenger'
 import Book from './pages/Book'
 import Order from './pages/Order'
 import AdminTrain from './pages/admin/Train'
@@ -29,6 +30,13 @@ const routes = [
                 component: Login,
                 meta: {
                     requiresNoAuth: true
+                },
+            },
+            {
+                path: '/passenger',
+                component: Passenger,
+                meta: {
+                    requiresAuth: true
                 },
             },
             {
@@ -106,6 +114,8 @@ router.beforeEach((to, from, next) => {
             } else {
                 next();
             }
+        } else {
+            next();
         }
     } else if (to.meta.requiresNoAuth) {
         //需要不认证

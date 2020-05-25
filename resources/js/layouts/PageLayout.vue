@@ -10,6 +10,7 @@
                     </div>
                     <div class="user" v-else>
                         <p>欢迎，{{$store.state.account.user.username}}<el-tag v-if="$store.state.account.user.type == 'admin'" type="success" size="mini">管理员</el-tag></p>
+                        <el-button type="primary" size="mini" @click="router.push('/passenger')">乘车人管理</el-button>
                         <el-button type="danger" size="mini" @click="handleLogout">退出</el-button>
                     </div>
                     <el-divider></el-divider>
@@ -111,6 +112,7 @@ export default {
                 message: '退出成功',
                 type: 'success'
             });
+            this.router.push('/')
         }
     }
 }
