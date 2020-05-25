@@ -74,11 +74,6 @@ export default {
                             message: error.response.data.message,
                             type: 'error'
                         });
-                        if (this.loginType == 'password') {
-                            this.passwordError = error.response.data.message
-                        } else {
-                            this.smsError = error.response.data.message
-                        }
                         this.logging = false
                     })
                 }

@@ -3604,6 +3604,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'PageLayout',
   data: function data() {
@@ -3675,6 +3676,7 @@ __webpack_require__.r(__webpack_exports__);
         message: '退出成功',
         type: 'success'
       });
+      this.router.push('/');
     }
   }
 });
@@ -3839,12 +3841,6 @@ __webpack_require__.r(__webpack_exports__);
               type: 'error'
             });
 
-            if (_this.loginType == 'password') {
-              _this.passwordError = error.response.data.message;
-            } else {
-              _this.smsError = error.response.data.message;
-            }
-
             _this.logging = false;
           });
         }
@@ -3880,6 +3876,481 @@ __webpack_require__.r(__webpack_exports__);
   name: 'Order',
   created: function created() {
     this.$emit('getTitle', '订单管理');
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/pages/Passenger.vue?vue&type=script&lang=js&":
+/*!***************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/pages/Passenger.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: 'Passenger',
+  data: function data() {
+    return {
+      passengers: [],
+      isPassengersLoading: true,
+      isDeleting: [],
+      addDialogVisible: false,
+      addForm: {
+        name: '',
+        id_type: '',
+        id_num: '',
+        gender: '',
+        mobile: '',
+        type: ''
+      },
+      isAddLoading: false,
+      editDialogVisible: false,
+      editForm: {
+        id: '',
+        name: '',
+        id_type: '',
+        id_num: '',
+        gender: '',
+        mobile: '',
+        type: ''
+      },
+      isEditLoading: false,
+      rules: {
+        name: [{
+          required: true,
+          message: '请输入姓名',
+          trigger: 'blur'
+        }],
+        id_type: [{
+          required: true,
+          message: '请选择证件类型',
+          trigger: 'blur'
+        }],
+        id_num: [{
+          required: true,
+          message: '请输入证件号码',
+          trigger: 'blur'
+        }],
+        gender: [{
+          required: true,
+          message: '请选择性别',
+          trigger: 'blur'
+        }],
+        mobile: [{
+          required: true,
+          message: '请输入手机号码',
+          trigger: 'blur'
+        }],
+        type: [{
+          required: true,
+          message: '请选择乘客类型',
+          trigger: 'blur'
+        }]
+      },
+      id_error: ''
+    };
+  },
+  beforeRouteEnter: function beforeRouteEnter(to, from, next) {
+    next(function (vm) {
+      vm.$axios.get('/api/passengers').then(function (response) {
+        for (var index = 0; index < response.data.length; index++) {
+          response.data[index].id_this = index + 1;
+
+          switch (response.data[index].id_type) {
+            case 'china_id':
+              response.data[index].id_type_name = '中国居民身份证';
+              break;
+
+            case 'hkmo_pass':
+              response.data[index].id_type_name = '港澳居民来往内地通行证';
+              break;
+
+            case 'tw_pass':
+              response.data[index].id_type_name = '台湾居民来往大陆通行证';
+              break;
+
+            case 'passport':
+              response.data[index].id_type_name = '护照';
+              break;
+          }
+
+          switch (response.data[index].gender) {
+            case 'male':
+              response.data[index].gender_name = '男';
+              break;
+
+            case 'female':
+              response.data[index].gender_name = '女';
+              break;
+          }
+
+          switch (response.data[index].type) {
+            case 'adult':
+              response.data[index].type_name = ['成人', 'success'];
+              break;
+
+            case 'child':
+              response.data[index].type_name = ['儿童', 'warning'];
+              break;
+
+            case 'student':
+              response.data[index].type_name = ['学生', 'primary'];
+              break;
+
+            case 'military':
+              response.data[index].type_name = ['伤残军警', 'danger'];
+              break;
+          }
+        }
+
+        vm.passengers = response.data;
+        vm.isPassengersLoading = false;
+      });
+    });
+  },
+  created: function created() {
+    this.$emit('getTitle', '乘车人管理');
+  },
+  methods: {
+    deletePassenger: function deletePassenger(id, isSelf) {
+      var _this = this;
+
+      if (isSelf) {
+        this.$message.error("您不能删除自己！");
+      } else {
+        this.isDeleting[id] = true;
+        this.$axios["delete"]('/api/passengers/' + id).then(function (resp) {
+          var res = resp.data;
+
+          if (resp.status == 200) {
+            _this.isFollowed = true;
+
+            _this.$message.success("删除成功！");
+
+            _this.refreshPassengerList();
+
+            _this.isDeleting[id] = false;
+          } else {
+            _this.$message.error("删除失败！");
+          }
+        })["catch"](function (err) {
+          _this.$message.error("删除失败！");
+        });
+      }
+    },
+    refreshPassengerList: function refreshPassengerList() {
+      this.isPassengersLoading = true;
+
+      var _t = this;
+
+      _t.$axios.get('/api/passengers').then(function (response) {
+        for (var index = 0; index < response.data.length; index++) {
+          response.data[index].id_this = index + 1;
+
+          switch (response.data[index].id_type) {
+            case 'china_id':
+              response.data[index].id_type_name = '中国居民身份证';
+              break;
+
+            case 'hkmo_pass':
+              response.data[index].id_type_name = '港澳居民来往内地通行证';
+              break;
+
+            case 'tw_pass':
+              response.data[index].id_type_name = '台湾居民来往大陆通行证';
+              break;
+
+            case 'passport':
+              response.data[index].id_type_name = '护照';
+              break;
+          }
+
+          switch (response.data[index].gender) {
+            case 'male':
+              response.data[index].gender_name = '男';
+              break;
+
+            case 'female':
+              response.data[index].gender_name = '女';
+              break;
+          }
+
+          switch (response.data[index].type) {
+            case 'adult':
+              response.data[index].type_name = ['成人', 'success'];
+              break;
+
+            case 'child':
+              response.data[index].type_name = ['儿童', 'warning'];
+              break;
+
+            case 'student':
+              response.data[index].type_name = ['学生', 'primary'];
+              break;
+
+            case 'military':
+              response.data[index].type_name = ['残军伤警', 'danger'];
+              break;
+          }
+        }
+
+        _t.passengers = response.data;
+        _t.isPassengersLoading = false;
+      });
+    },
+    closeAddDialog: function closeAddDialog() {
+      this.addDialogVisible = false;
+      this.$refs['addForm'].resetFields();
+    },
+    closeEditdDialog: function closeEditdDialog() {
+      this.editDialogVisible = false;
+      this.$refs['editForm'].resetFields();
+    },
+    addPassenger: function addPassenger() {
+      var _this2 = this;
+
+      this.id_error = '';
+      this.$refs['addForm'].validate(function (err) {
+        if (err) {
+          _this2.isAddLoading = true;
+
+          _this2.$axios.post('/api/passengers', {
+            name: _this2.addForm.name,
+            id_type: _this2.addForm.id_type,
+            id_num: _this2.addForm.id_num,
+            gender: _this2.addForm.gender,
+            mobile: _this2.addForm.mobile,
+            type: _this2.addForm.type
+          }).then(function (res) {
+            var result = res.data;
+
+            if (res.status == 201) {
+              _this2.isAddLoading = false;
+
+              _this2.closeAddDialog();
+
+              _this2.refreshPassengerList();
+
+              _this2.$message({
+                showClose: true,
+                message: '添加成功',
+                type: 'success'
+              });
+            } else {
+              _this2.isAddLoading = false;
+
+              _this2.$message({
+                showClose: true,
+                message: '添加失败，请稍后重试',
+                type: 'error'
+              });
+            }
+          })["catch"](function (error) {
+            _this2.$message({
+              showClose: true,
+              message: '添加失败：' + error.response.data.message,
+              type: 'error'
+            });
+
+            if (error.response.data.message.indexOf('身份证号码不合法') != -1) {
+              _this2.id_error = '身份证号码不合法';
+            }
+
+            _this2.isAddLoading = false;
+          });
+        }
+      });
+    },
+    handleEdit: function handleEdit(id) {
+      this.editForm.id = id;
+
+      for (var index = 0; index < this.passengers.length; index++) {
+        if (id == this.passengers[index].id) {
+          this.editForm.name = this.passengers[index].name;
+          this.editForm.id_type = this.passengers[index].id_type;
+          this.editForm.id_num = this.passengers[index].id_num;
+          this.editForm.gender = this.passengers[index].gender;
+          this.editForm.mobile = this.passengers[index].mobile;
+          this.editForm.type = this.passengers[index].type;
+          break;
+        }
+      }
+
+      this.editDialogVisible = true;
+    },
+    editPassenger: function editPassenger() {
+      var _this3 = this;
+
+      this.id_error = '';
+      this.$refs['editForm'].validate(function (err) {
+        if (err) {
+          _this3.isEditLoading = true;
+
+          _this3.$axios.patch('/api/passengers/' + _this3.editForm.id, {
+            name: _this3.editForm.name,
+            id_type: _this3.editForm.id_type,
+            id_num: _this3.editForm.id_num,
+            gender: _this3.editForm.gender,
+            mobile: _this3.editForm.mobile,
+            type: _this3.editForm.type
+          }).then(function (res) {
+            var result = res.data;
+
+            if (res.status == 200) {
+              _this3.isEditLoading = false;
+
+              _this3.closeEditdDialog();
+
+              _this3.refreshPassengerList();
+
+              _this3.$message({
+                showClose: true,
+                message: '编辑成功',
+                type: 'success'
+              });
+            } else {
+              _this3.isEditLoading = false;
+
+              _this3.$message({
+                showClose: true,
+                message: '编辑失败，请稍后重试',
+                type: 'error'
+              });
+            }
+          })["catch"](function (error) {
+            _this3.$message({
+              showClose: true,
+              message: '编辑失败：' + error.response.data.message,
+              type: 'error'
+            });
+
+            if (error.response.data.message.indexOf('身份证号码不合法') != -1) {
+              _this3.id_error = '身份证号码不合法';
+            }
+
+            _this3.isEditLoading = false;
+          });
+        }
+      });
+    }
   }
 });
 
@@ -5862,6 +6333,44 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 // module
 exports.push([module.i, ".login-form .el-input__suffix {\n  margin-right: 5px;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/less-loader/dist/cjs.js!./node_modules/vue-loader/lib/index.js?!./resources/js/pages/Passenger.vue?vue&type=style&index=0&id=2e085f3e&lang=less&scoped=true&":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--9-2!./node_modules/less-loader/dist/cjs.js!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/pages/Passenger.vue?vue&type=style&index=0&id=2e085f3e&lang=less&scoped=true& ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, ".page h1[data-v-2e085f3e] {\n  font-size: 20px;\n  margin: 0 0 20px 0;\n}\n.page .passenger-table[data-v-2e085f3e] {\n  width: 100%;\n}\n.add-edit-form .el-select[data-v-2e085f3e] {\n  width: 100%;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/less-loader/dist/cjs.js!./node_modules/vue-loader/lib/index.js?!./resources/js/pages/Passenger.vue?vue&type=style&index=1&lang=less&":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--9-2!./node_modules/less-loader/dist/cjs.js!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/pages/Passenger.vue?vue&type=style&index=1&lang=less& ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, ".body-card .el-card__body {\n  height: calc(100% - 101px);\n}\n.passenger-table th,\n.passenger-table td {\n  text-align: center;\n}\n", ""]);
 
 // exports
 
@@ -81908,6 +82417,66 @@ if(false) {}
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/less-loader/dist/cjs.js!./node_modules/vue-loader/lib/index.js?!./resources/js/pages/Passenger.vue?vue&type=style&index=0&id=2e085f3e&lang=less&scoped=true&":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader!./node_modules/css-loader!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--9-2!./node_modules/less-loader/dist/cjs.js!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/pages/Passenger.vue?vue&type=style&index=0&id=2e085f3e&lang=less&scoped=true& ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../../node_modules/css-loader!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/src??ref--9-2!../../../node_modules/less-loader/dist/cjs.js!../../../node_modules/vue-loader/lib??vue-loader-options!./Passenger.vue?vue&type=style&index=0&id=2e085f3e&lang=less&scoped=true& */ "./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/less-loader/dist/cjs.js!./node_modules/vue-loader/lib/index.js?!./resources/js/pages/Passenger.vue?vue&type=style&index=0&id=2e085f3e&lang=less&scoped=true&");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/less-loader/dist/cjs.js!./node_modules/vue-loader/lib/index.js?!./resources/js/pages/Passenger.vue?vue&type=style&index=1&lang=less&":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader!./node_modules/css-loader!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--9-2!./node_modules/less-loader/dist/cjs.js!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/pages/Passenger.vue?vue&type=style&index=1&lang=less& ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../../node_modules/css-loader!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/src??ref--9-2!../../../node_modules/less-loader/dist/cjs.js!../../../node_modules/vue-loader/lib??vue-loader-options!./Passenger.vue?vue&type=style&index=1&lang=less& */ "./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/less-loader/dist/cjs.js!./node_modules/vue-loader/lib/index.js?!./resources/js/pages/Passenger.vue?vue&type=style&index=1&lang=less&");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/lib/addStyles.js":
 /*!****************************************************!*\
   !*** ./node_modules/style-loader/lib/addStyles.js ***!
@@ -83000,6 +83569,19 @@ var render = function() {
                           _c(
                             "el-button",
                             {
+                              attrs: { type: "primary", size: "mini" },
+                              on: {
+                                click: function($event) {
+                                  return _vm.router.push("/passenger")
+                                }
+                              }
+                            },
+                            [_vm._v("乘车人管理")]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "el-button",
+                            {
                               attrs: { type: "danger", size: "mini" },
                               on: { click: _vm.handleLogout }
                             },
@@ -83400,6 +83982,683 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div")
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/pages/Passenger.vue?vue&type=template&id=2e085f3e&scoped=true&":
+/*!*******************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/pages/Passenger.vue?vue&type=template&id=2e085f3e&scoped=true& ***!
+  \*******************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticClass: "page" },
+    [
+      _c(
+        "el-table",
+        {
+          directives: [
+            {
+              name: "loading",
+              rawName: "v-loading",
+              value: _vm.isPassengersLoading,
+              expression: "isPassengersLoading"
+            }
+          ],
+          staticClass: "passenger-table",
+          attrs: {
+            data: _vm.passengers,
+            height: "100%",
+            stripe: "",
+            border: ""
+          }
+        },
+        [
+          _c("el-table-column", {
+            attrs: { prop: "id_this", label: "序号", width: "60" }
+          }),
+          _vm._v(" "),
+          _c("el-table-column", {
+            attrs: { prop: "name", label: "姓名", width: "120" }
+          }),
+          _vm._v(" "),
+          _c("el-table-column", {
+            attrs: { prop: "id_type_name", label: "证件类型", width: "180" }
+          }),
+          _vm._v(" "),
+          _c("el-table-column", {
+            attrs: { prop: "id_num", label: "证件号码", width: "200" }
+          }),
+          _vm._v(" "),
+          _c("el-table-column", {
+            attrs: { prop: "gender_name", label: "性别", width: "60" }
+          }),
+          _vm._v(" "),
+          _c("el-table-column", {
+            attrs: { prop: "mobile", label: "手机号码", width: "140" }
+          }),
+          _vm._v(" "),
+          _c("el-table-column", {
+            attrs: { label: "乘客类型", width: "100" },
+            scopedSlots: _vm._u([
+              {
+                key: "default",
+                fn: function(scope) {
+                  return [
+                    _c(
+                      "el-tag",
+                      {
+                        attrs: { type: scope.row.type_name[1], size: "small" }
+                      },
+                      [_vm._v(_vm._s(scope.row.type_name[0]))]
+                    )
+                  ]
+                }
+              }
+            ])
+          }),
+          _vm._v(" "),
+          _c(
+            "el-table-column",
+            {
+              attrs: { fixed: "right", width: "160" },
+              scopedSlots: _vm._u([
+                {
+                  key: "default",
+                  fn: function(scope) {
+                    return [
+                      _c(
+                        "el-button",
+                        {
+                          attrs: { type: "primary", size: "mini" },
+                          on: {
+                            click: function($event) {
+                              return _vm.handleEdit(scope.row.id)
+                            }
+                          }
+                        },
+                        [_vm._v("编辑")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "el-popconfirm",
+                        {
+                          attrs: {
+                            confirmButtonText: "删除",
+                            confirmButtonType: "danger",
+                            cancelButtonText: "取消",
+                            icon: "el-icon-info",
+                            iconColor: "red",
+                            title: "您确定删除此乘客信息吗？"
+                          },
+                          on: {
+                            onConfirm: function($event) {
+                              return _vm.deletePassenger(
+                                scope.row.id,
+                                scope.row.is_self
+                              )
+                            }
+                          }
+                        },
+                        [
+                          _c(
+                            "el-button",
+                            {
+                              attrs: {
+                                slot: "reference",
+                                type: "danger",
+                                size: "mini",
+                                disabled: Boolean(scope.row.is_self),
+                                loading: _vm.isDeleting[scope.row.id]
+                              },
+                              slot: "reference"
+                            },
+                            [_vm._v("删除")]
+                          )
+                        ],
+                        1
+                      )
+                    ]
+                  }
+                }
+              ])
+            },
+            [
+              _c(
+                "template",
+                { slot: "header" },
+                [
+                  _c(
+                    "el-button",
+                    {
+                      attrs: { type: "success", size: "mini" },
+                      on: {
+                        click: function($event) {
+                          _vm.addDialogVisible = true
+                        }
+                      }
+                    },
+                    [
+                      _c("i", {
+                        staticClass: "fas fa-plus",
+                        staticStyle: { "margin-right": "3px" }
+                      }),
+                      _vm._v("添加")
+                    ]
+                  )
+                ],
+                1
+              )
+            ],
+            2
+          )
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "el-dialog",
+        {
+          attrs: {
+            title: "添加乘车人",
+            visible: _vm.addDialogVisible,
+            width: "400px",
+            "close-on-click-modal": false
+          },
+          on: {
+            "update:visible": function($event) {
+              _vm.addDialogVisible = $event
+            },
+            close: _vm.closeAddDialog
+          }
+        },
+        [
+          _c(
+            "el-form",
+            {
+              ref: "addForm",
+              staticClass: "add-edit-form",
+              attrs: {
+                model: _vm.addForm,
+                rules: _vm.rules,
+                "label-width": "auto"
+              }
+            },
+            [
+              _c(
+                "el-form-item",
+                { attrs: { label: "姓名", prop: "name" } },
+                [
+                  _c("el-input", {
+                    attrs: { placeholder: "姓名" },
+                    model: {
+                      value: _vm.addForm.name,
+                      callback: function($$v) {
+                        _vm.$set(_vm.addForm, "name", $$v)
+                      },
+                      expression: "addForm.name"
+                    }
+                  })
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "el-form-item",
+                { attrs: { label: "证件类型", prop: "id_type" } },
+                [
+                  _c(
+                    "el-select",
+                    {
+                      attrs: { placeholder: "证件类型" },
+                      model: {
+                        value: _vm.addForm.id_type,
+                        callback: function($$v) {
+                          _vm.$set(_vm.addForm, "id_type", $$v)
+                        },
+                        expression: "addForm.id_type"
+                      }
+                    },
+                    [
+                      _c("el-option", {
+                        attrs: { label: "中国居民身份证", value: "china_id" }
+                      }),
+                      _vm._v(" "),
+                      _c("el-option", {
+                        attrs: {
+                          label: "港澳居民来往内地通行证",
+                          value: "hkmo_pass"
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("el-option", {
+                        attrs: {
+                          label: "台湾居民来往大陆通行证",
+                          value: "tw_pass"
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("el-option", {
+                        attrs: { label: "护照", value: "passport" }
+                      })
+                    ],
+                    1
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "el-form-item",
+                {
+                  attrs: {
+                    label: "证件号码",
+                    prop: "id_num",
+                    error: _vm.id_error
+                  }
+                },
+                [
+                  _c("el-input", {
+                    attrs: { placeholder: "证件号码" },
+                    model: {
+                      value: _vm.addForm.id_num,
+                      callback: function($$v) {
+                        _vm.$set(_vm.addForm, "id_num", $$v)
+                      },
+                      expression: "addForm.id_num"
+                    }
+                  })
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "el-form-item",
+                { attrs: { label: "性别", prop: "gender" } },
+                [
+                  _c(
+                    "el-radio-group",
+                    {
+                      model: {
+                        value: _vm.addForm.gender,
+                        callback: function($$v) {
+                          _vm.$set(_vm.addForm, "gender", $$v)
+                        },
+                        expression: "addForm.gender"
+                      }
+                    },
+                    [
+                      _c("el-radio", { attrs: { border: "", label: "male" } }, [
+                        _vm._v("男")
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "el-radio",
+                        { attrs: { border: "", label: "female" } },
+                        [_vm._v("女")]
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "el-form-item",
+                { attrs: { label: "手机号码", prop: "mobile" } },
+                [
+                  _c("el-input", {
+                    attrs: { placeholder: "手机号码" },
+                    model: {
+                      value: _vm.addForm.mobile,
+                      callback: function($$v) {
+                        _vm.$set(_vm.addForm, "mobile", $$v)
+                      },
+                      expression: "addForm.mobile"
+                    }
+                  })
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "el-form-item",
+                { attrs: { label: "乘客类型", prop: "type" } },
+                [
+                  _c(
+                    "el-select",
+                    {
+                      attrs: { placeholder: "乘客类型" },
+                      model: {
+                        value: _vm.addForm.type,
+                        callback: function($$v) {
+                          _vm.$set(_vm.addForm, "type", $$v)
+                        },
+                        expression: "addForm.type"
+                      }
+                    },
+                    [
+                      _c("el-option", {
+                        attrs: { label: "成人", value: "adult" }
+                      }),
+                      _vm._v(" "),
+                      _c("el-option", {
+                        attrs: { label: "儿童", value: "child" }
+                      }),
+                      _vm._v(" "),
+                      _c("el-option", {
+                        attrs: { label: "学生", value: "student" }
+                      }),
+                      _vm._v(" "),
+                      _c("el-option", {
+                        attrs: {
+                          label: "残疾军人、伤残人民警察",
+                          value: "military"
+                        }
+                      })
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "div",
+            {
+              staticClass: "add-dialog-footer",
+              attrs: { slot: "footer" },
+              slot: "footer"
+            },
+            [
+              _c(
+                "el-button",
+                {
+                  attrs: { disabled: _vm.isAddLoading },
+                  on: { click: _vm.closeAddDialog }
+                },
+                [_vm._v("取消")]
+              ),
+              _vm._v(" "),
+              _c(
+                "el-button",
+                {
+                  attrs: { type: "primary", loading: _vm.isAddLoading },
+                  on: { click: _vm.addPassenger }
+                },
+                [_vm._v("确定")]
+              )
+            ],
+            1
+          )
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "el-dialog",
+        {
+          attrs: {
+            title: "编辑乘车人信息",
+            visible: _vm.editDialogVisible,
+            width: "400px",
+            "close-on-click-modal": false
+          },
+          on: {
+            "update:visible": function($event) {
+              _vm.editDialogVisible = $event
+            },
+            close: _vm.closeEditdDialog
+          }
+        },
+        [
+          _c(
+            "el-form",
+            {
+              ref: "editForm",
+              staticClass: "add-edit-form",
+              attrs: {
+                model: _vm.editForm,
+                rules: _vm.rules,
+                "label-width": "auto"
+              }
+            },
+            [
+              _c(
+                "el-form-item",
+                { attrs: { label: "姓名", prop: "name" } },
+                [
+                  _c("el-input", {
+                    attrs: { placeholder: "姓名" },
+                    model: {
+                      value: _vm.editForm.name,
+                      callback: function($$v) {
+                        _vm.$set(_vm.editForm, "name", $$v)
+                      },
+                      expression: "editForm.name"
+                    }
+                  })
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "el-form-item",
+                { attrs: { label: "证件类型", prop: "id_type" } },
+                [
+                  _c(
+                    "el-select",
+                    {
+                      attrs: { placeholder: "证件类型" },
+                      model: {
+                        value: _vm.editForm.id_type,
+                        callback: function($$v) {
+                          _vm.$set(_vm.editForm, "id_type", $$v)
+                        },
+                        expression: "editForm.id_type"
+                      }
+                    },
+                    [
+                      _c("el-option", {
+                        attrs: { label: "中国居民身份证", value: "china_id" }
+                      }),
+                      _vm._v(" "),
+                      _c("el-option", {
+                        attrs: {
+                          label: "港澳居民来往内地通行证",
+                          value: "hkmo_pass"
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("el-option", {
+                        attrs: {
+                          label: "台湾居民来往大陆通行证",
+                          value: "tw_pass"
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("el-option", {
+                        attrs: { label: "护照", value: "passport" }
+                      })
+                    ],
+                    1
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "el-form-item",
+                {
+                  attrs: {
+                    label: "证件号码",
+                    prop: "id_num",
+                    error: _vm.id_error
+                  }
+                },
+                [
+                  _c("el-input", {
+                    attrs: { placeholder: "证件号码" },
+                    model: {
+                      value: _vm.editForm.id_num,
+                      callback: function($$v) {
+                        _vm.$set(_vm.editForm, "id_num", $$v)
+                      },
+                      expression: "editForm.id_num"
+                    }
+                  })
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "el-form-item",
+                { attrs: { label: "性别", prop: "gender" } },
+                [
+                  _c(
+                    "el-radio-group",
+                    {
+                      model: {
+                        value: _vm.editForm.gender,
+                        callback: function($$v) {
+                          _vm.$set(_vm.editForm, "gender", $$v)
+                        },
+                        expression: "editForm.gender"
+                      }
+                    },
+                    [
+                      _c("el-radio", { attrs: { border: "", label: "male" } }, [
+                        _vm._v("男")
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "el-radio",
+                        { attrs: { border: "", label: "female" } },
+                        [_vm._v("女")]
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "el-form-item",
+                { attrs: { label: "手机号码", prop: "mobile" } },
+                [
+                  _c("el-input", {
+                    attrs: { placeholder: "手机号码" },
+                    model: {
+                      value: _vm.editForm.mobile,
+                      callback: function($$v) {
+                        _vm.$set(_vm.editForm, "mobile", $$v)
+                      },
+                      expression: "editForm.mobile"
+                    }
+                  })
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "el-form-item",
+                { attrs: { label: "乘客类型", prop: "type" } },
+                [
+                  _c(
+                    "el-select",
+                    {
+                      attrs: { placeholder: "乘客类型" },
+                      model: {
+                        value: _vm.editForm.type,
+                        callback: function($$v) {
+                          _vm.$set(_vm.editForm, "type", $$v)
+                        },
+                        expression: "editForm.type"
+                      }
+                    },
+                    [
+                      _c("el-option", {
+                        attrs: { label: "成人", value: "adult" }
+                      }),
+                      _vm._v(" "),
+                      _c("el-option", {
+                        attrs: { label: "儿童", value: "child" }
+                      }),
+                      _vm._v(" "),
+                      _c("el-option", {
+                        attrs: { label: "学生", value: "student" }
+                      }),
+                      _vm._v(" "),
+                      _c("el-option", {
+                        attrs: {
+                          label: "残疾军人、伤残人民警察",
+                          value: "military"
+                        }
+                      })
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "div",
+            {
+              staticClass: "add-dialog-footer",
+              attrs: { slot: "footer" },
+              slot: "footer"
+            },
+            [
+              _c(
+                "el-button",
+                {
+                  attrs: { disabled: _vm.isEditLoading },
+                  on: { click: _vm.closeEditdDialog }
+                },
+                [_vm._v("取消")]
+              ),
+              _vm._v(" "),
+              _c(
+                "el-button",
+                {
+                  attrs: { type: "primary", loading: _vm.isEditLoading },
+                  on: { click: _vm.editPassenger }
+                },
+                [_vm._v("确定")]
+              )
+            ],
+            1
+          )
+        ],
+        1
+      )
+    ],
+    1
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -100385,6 +101644,111 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/pages/Passenger.vue":
+/*!******************************************!*\
+  !*** ./resources/js/pages/Passenger.vue ***!
+  \******************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Passenger_vue_vue_type_template_id_2e085f3e_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Passenger.vue?vue&type=template&id=2e085f3e&scoped=true& */ "./resources/js/pages/Passenger.vue?vue&type=template&id=2e085f3e&scoped=true&");
+/* harmony import */ var _Passenger_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Passenger.vue?vue&type=script&lang=js& */ "./resources/js/pages/Passenger.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _Passenger_vue_vue_type_style_index_0_id_2e085f3e_lang_less_scoped_true___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Passenger.vue?vue&type=style&index=0&id=2e085f3e&lang=less&scoped=true& */ "./resources/js/pages/Passenger.vue?vue&type=style&index=0&id=2e085f3e&lang=less&scoped=true&");
+/* harmony import */ var _Passenger_vue_vue_type_style_index_1_lang_less___WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Passenger.vue?vue&type=style&index=1&lang=less& */ "./resources/js/pages/Passenger.vue?vue&type=style&index=1&lang=less&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_4__["default"])(
+  _Passenger_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _Passenger_vue_vue_type_template_id_2e085f3e_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _Passenger_vue_vue_type_template_id_2e085f3e_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "2e085f3e",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/pages/Passenger.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/pages/Passenger.vue?vue&type=script&lang=js&":
+/*!*******************************************************************!*\
+  !*** ./resources/js/pages/Passenger.vue?vue&type=script&lang=js& ***!
+  \*******************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Passenger_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./Passenger.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/pages/Passenger.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Passenger_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/pages/Passenger.vue?vue&type=style&index=0&id=2e085f3e&lang=less&scoped=true&":
+/*!****************************************************************************************************!*\
+  !*** ./resources/js/pages/Passenger.vue?vue&type=style&index=0&id=2e085f3e&lang=less&scoped=true& ***!
+  \****************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_9_2_node_modules_less_loader_dist_cjs_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Passenger_vue_vue_type_style_index_0_id_2e085f3e_lang_less_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader!../../../node_modules/css-loader!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/src??ref--9-2!../../../node_modules/less-loader/dist/cjs.js!../../../node_modules/vue-loader/lib??vue-loader-options!./Passenger.vue?vue&type=style&index=0&id=2e085f3e&lang=less&scoped=true& */ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/less-loader/dist/cjs.js!./node_modules/vue-loader/lib/index.js?!./resources/js/pages/Passenger.vue?vue&type=style&index=0&id=2e085f3e&lang=less&scoped=true&");
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_9_2_node_modules_less_loader_dist_cjs_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Passenger_vue_vue_type_style_index_0_id_2e085f3e_lang_less_scoped_true___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_9_2_node_modules_less_loader_dist_cjs_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Passenger_vue_vue_type_style_index_0_id_2e085f3e_lang_less_scoped_true___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_9_2_node_modules_less_loader_dist_cjs_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Passenger_vue_vue_type_style_index_0_id_2e085f3e_lang_less_scoped_true___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_9_2_node_modules_less_loader_dist_cjs_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Passenger_vue_vue_type_style_index_0_id_2e085f3e_lang_less_scoped_true___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_9_2_node_modules_less_loader_dist_cjs_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Passenger_vue_vue_type_style_index_0_id_2e085f3e_lang_less_scoped_true___WEBPACK_IMPORTED_MODULE_0___default.a); 
+
+/***/ }),
+
+/***/ "./resources/js/pages/Passenger.vue?vue&type=style&index=1&lang=less&":
+/*!****************************************************************************!*\
+  !*** ./resources/js/pages/Passenger.vue?vue&type=style&index=1&lang=less& ***!
+  \****************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_9_2_node_modules_less_loader_dist_cjs_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Passenger_vue_vue_type_style_index_1_lang_less___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader!../../../node_modules/css-loader!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/src??ref--9-2!../../../node_modules/less-loader/dist/cjs.js!../../../node_modules/vue-loader/lib??vue-loader-options!./Passenger.vue?vue&type=style&index=1&lang=less& */ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/less-loader/dist/cjs.js!./node_modules/vue-loader/lib/index.js?!./resources/js/pages/Passenger.vue?vue&type=style&index=1&lang=less&");
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_9_2_node_modules_less_loader_dist_cjs_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Passenger_vue_vue_type_style_index_1_lang_less___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_9_2_node_modules_less_loader_dist_cjs_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Passenger_vue_vue_type_style_index_1_lang_less___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_9_2_node_modules_less_loader_dist_cjs_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Passenger_vue_vue_type_style_index_1_lang_less___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_9_2_node_modules_less_loader_dist_cjs_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Passenger_vue_vue_type_style_index_1_lang_less___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_9_2_node_modules_less_loader_dist_cjs_js_node_modules_vue_loader_lib_index_js_vue_loader_options_Passenger_vue_vue_type_style_index_1_lang_less___WEBPACK_IMPORTED_MODULE_0___default.a); 
+
+/***/ }),
+
+/***/ "./resources/js/pages/Passenger.vue?vue&type=template&id=2e085f3e&scoped=true&":
+/*!*************************************************************************************!*\
+  !*** ./resources/js/pages/Passenger.vue?vue&type=template&id=2e085f3e&scoped=true& ***!
+  \*************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Passenger_vue_vue_type_template_id_2e085f3e_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./Passenger.vue?vue&type=template&id=2e085f3e&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/pages/Passenger.vue?vue&type=template&id=2e085f3e&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Passenger_vue_vue_type_template_id_2e085f3e_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Passenger_vue_vue_type_template_id_2e085f3e_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./resources/js/pages/admin/Order.vue":
 /*!********************************************!*\
   !*** ./resources/js/pages/admin/Order.vue ***!
@@ -100609,12 +101973,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _layouts_PageLayout__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./layouts/PageLayout */ "./resources/js/layouts/PageLayout.vue");
 /* harmony import */ var _pages_Home__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./pages/Home */ "./resources/js/pages/Home.vue");
 /* harmony import */ var _pages_Login__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./pages/Login */ "./resources/js/pages/Login.vue");
-/* harmony import */ var _pages_Book__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./pages/Book */ "./resources/js/pages/Book.vue");
-/* harmony import */ var _pages_Order__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./pages/Order */ "./resources/js/pages/Order.vue");
-/* harmony import */ var _pages_admin_Train__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./pages/admin/Train */ "./resources/js/pages/admin/Train.vue");
-/* harmony import */ var _pages_admin_Order__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./pages/admin/Order */ "./resources/js/pages/admin/Order.vue");
-/* harmony import */ var _pages_admin_User__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./pages/admin/User */ "./resources/js/pages/admin/User.vue");
-/* harmony import */ var _pages_Error__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./pages/Error */ "./resources/js/pages/Error.vue");
+/* harmony import */ var _pages_Passenger__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./pages/Passenger */ "./resources/js/pages/Passenger.vue");
+/* harmony import */ var _pages_Book__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./pages/Book */ "./resources/js/pages/Book.vue");
+/* harmony import */ var _pages_Order__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./pages/Order */ "./resources/js/pages/Order.vue");
+/* harmony import */ var _pages_admin_Train__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./pages/admin/Train */ "./resources/js/pages/admin/Train.vue");
+/* harmony import */ var _pages_admin_Order__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./pages/admin/Order */ "./resources/js/pages/admin/Order.vue");
+/* harmony import */ var _pages_admin_User__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./pages/admin/User */ "./resources/js/pages/admin/User.vue");
+/* harmony import */ var _pages_Error__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./pages/Error */ "./resources/js/pages/Error.vue");
+
 
 
 
@@ -100642,44 +102008,50 @@ var routes = [{
       requiresNoAuth: true
     }
   }, {
+    path: '/passenger',
+    component: _pages_Passenger__WEBPACK_IMPORTED_MODULE_7__["default"],
+    meta: {
+      requiresAuth: true
+    }
+  }, {
     path: '/book',
-    component: _pages_Book__WEBPACK_IMPORTED_MODULE_7__["default"],
+    component: _pages_Book__WEBPACK_IMPORTED_MODULE_8__["default"],
     meta: {
       requiresAuth: true
     }
   }, {
     path: '/order',
-    component: _pages_Order__WEBPACK_IMPORTED_MODULE_8__["default"],
+    component: _pages_Order__WEBPACK_IMPORTED_MODULE_9__["default"],
     meta: {
       requiresAuth: true
     }
   }, {
     path: '/admin/train',
-    component: _pages_admin_Train__WEBPACK_IMPORTED_MODULE_9__["default"],
+    component: _pages_admin_Train__WEBPACK_IMPORTED_MODULE_10__["default"],
     meta: {
       requiresAuth: true,
       requiresAdmin: true
     }
   }, {
     path: '/admin/order',
-    component: _pages_admin_Order__WEBPACK_IMPORTED_MODULE_10__["default"],
+    component: _pages_admin_Order__WEBPACK_IMPORTED_MODULE_11__["default"],
     meta: {
       requiresAuth: true,
       requiresAdmin: true
     }
   }, {
     path: '/admin/user',
-    component: _pages_admin_User__WEBPACK_IMPORTED_MODULE_11__["default"],
+    component: _pages_admin_User__WEBPACK_IMPORTED_MODULE_12__["default"],
     meta: {
       requiresAuth: true,
       requiresAdmin: true
     }
   }, {
     path: '/error',
-    component: _pages_Error__WEBPACK_IMPORTED_MODULE_12__["default"]
+    component: _pages_Error__WEBPACK_IMPORTED_MODULE_13__["default"]
   }, {
     path: '/*',
-    component: _pages_Error__WEBPACK_IMPORTED_MODULE_12__["default"]
+    component: _pages_Error__WEBPACK_IMPORTED_MODULE_13__["default"]
   }]
 }];
 var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
@@ -100706,6 +102078,8 @@ router.beforeEach(function (to, from, next) {
       } else {
         next();
       }
+    } else {
+      next();
     }
   } else if (to.meta.requiresNoAuth) {
     //需要不认证

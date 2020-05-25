@@ -36,4 +36,14 @@ Route::middleware('auth:api')->group(function() {
     Route::get('/users/{user}', 'UsersController@show');
     // 编辑用户信息
     Route::patch('/users/{user}', 'UsersController@update');
+    // 获取当前登录用户的所有乘客
+    Route::get('/passengers', 'PassengersController@index');
+    // 获取某乘客信息
+    Route::get('/passengers/{passenger}', 'PassengersController@show');
+    // 添加乘客
+    Route::post('/passengers', 'PassengersController@store');
+    // 编辑乘客信息
+    Route::patch('/passengers/{passenger}', 'PassengersController@update');
+    // 删除乘客
+    Route::delete('/passengers/{passenger}', 'PassengersController@delete');
 });
