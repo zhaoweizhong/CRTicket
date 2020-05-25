@@ -3795,7 +3795,19 @@ __webpack_require__.r(__webpack_exports__);
         username: '',
         password: ''
       },
-      logging: false
+      logging: false,
+      rules: {
+        username: [{
+          required: true,
+          message: '请输入用户名',
+          trigger: 'blur'
+        }],
+        password: [{
+          required: true,
+          message: '请输入密码',
+          trigger: 'blur'
+        }]
+      }
     };
   },
   created: function created() {
@@ -3805,6 +3817,7 @@ __webpack_require__.r(__webpack_exports__);
     handleLogin: function handleLogin() {
       var _this = this;
 
+      this.loginError = '';
       this.$refs['loginForm'].validate(function (err) {
         if (err) {
           _this.logging = true;
@@ -3840,6 +3853,10 @@ __webpack_require__.r(__webpack_exports__);
               message: error.response.data.message,
               type: 'error'
             });
+
+            if (error.response.data.message.indexOf('用户名或密码错误') != -1) {
+              _this.loginError = '用户名或密码错误';
+            }
 
             _this.logging = false;
           });
@@ -83840,7 +83857,7 @@ var render = function() {
         {
           ref: "loginForm",
           staticClass: "login-form",
-          attrs: { model: _vm.loginForm }
+          attrs: { model: _vm.loginForm, rules: _vm.rules }
         },
         [
           _c("img", {
@@ -83850,6 +83867,7 @@ var render = function() {
           _vm._v(" "),
           _c(
             "el-form-item",
+            { attrs: { prop: "username", error: _vm.loginError } },
             [
               _c(
                 "el-input",
@@ -83877,6 +83895,7 @@ var render = function() {
           _vm._v(" "),
           _c(
             "el-form-item",
+            { attrs: { prop: "password", error: _vm.loginError } },
             [
               _c(
                 "el-input",
