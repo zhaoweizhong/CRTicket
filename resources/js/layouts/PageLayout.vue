@@ -1,5 +1,5 @@
 <template>
-    <div class="page">
+    <div class="page-layout">
         <el-container class="sider">
             <el-aside width="250px">
                 <el-menu :default-active.sync="activeItem" @select="handleNavSelect">
@@ -130,7 +130,7 @@ export default {
     opacity: 0;
     padding: 0;
 }
-.page {
+.page-layout {
     height: 100%;
 }
 .sider {

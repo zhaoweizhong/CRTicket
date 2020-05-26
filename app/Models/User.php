@@ -32,6 +32,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Passenger::class);
     }
 
+    public function orders() {
+        return $this->hasMany(Order::class);
+    }
+
     /**
      * The attributes that should be cast to native types.
      *
