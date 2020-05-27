@@ -1,13 +1,13 @@
 <template>
     <div class="page">
-        <el-form class="login-form" ref="loginForm" :model="loginForm">
+        <el-form class="login-form" ref="loginForm" :model="loginForm" :rules="rules">
             <img src="images/logo.png" alt="" class="logo">
-            <el-form-item>
+            <el-form-item prop="username" :error="loginError">
                 <el-input v-model="loginForm.username" placeholder="用户名">
                     <i slot="suffix" class="far fa-user"></i>
                 </el-input>
             </el-form-item>
-            <el-form-item>
+            <el-form-item prop="password" :error="loginError">
                 <el-input type="password" v-model="loginForm.password" placeholder="密码">
                     <i slot="suffix" class="far fa-key"></i>
                 </el-input>
@@ -37,6 +37,15 @@ export default {
                 password: '',
             },
             logging: false,
+            rules: {
+                username: [
+                    { required: true, message: '请输入用户名', trigger: 'blur' },
+                ],
+                password: [
+                    { required: true, message: '请输入密码', trigger: 'blur' },
+                ],
+            },
+            loginError: ''
         }
     },
     created() {
@@ -44,6 +53,7 @@ export default {
     },
     methods: {
         handleLogin() {
+            this.loginError = ''
             this.$refs['loginForm'].validate((err) => {
                 if (err) {
                     this.logging = true
@@ -74,6 +84,9 @@ export default {
                             message: error.response.data.message,
                             type: 'error'
                         });
+                        if (error.response.data.message.indexOf('用户名或密码错误') != -1) {
+                            this.loginError = '用户名或密码错误'
+                        }
                         this.logging = false
                     })
                 }

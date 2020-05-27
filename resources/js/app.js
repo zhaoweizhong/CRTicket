@@ -6,15 +6,20 @@ import App from './App.vue';
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import {getCookie} from 'tiny-cookie'
+import moment from 'moment-timezone'
+import momentLocale from 'moment/locale/zh-cn'
 
 import router from './router';
 import store from "./store";
 
 Vue.use(ElementUI);
+Vue.use(moment)
+Vue.use(momentLocale)
 
 Vue.prototype.$axios = axios;
 Vue.prototype.router = router
 Vue.prototype.$store = store;
+Vue.prototype.$moment = moment;
 
 axios.interceptors.response.use(
 	function (response) {

@@ -1,9 +1,9 @@
 <template>
-    <div class="page">
+    <div class="page-layout">
         <el-container class="sider">
             <el-aside width="250px">
                 <el-menu :default-active.sync="activeItem" @select="handleNavSelect">
-                    <img src="images/logo.png" class="logo">
+                    <img src="/images/logo.png" class="logo">
                     <div class="user" v-if="!$store.state.account.isLogin">
                         <p>欢迎，请登录</p>
                         <el-button type="success" size="mini" @click="router.push('/login')">登录</el-button>
@@ -20,8 +20,6 @@
                     <el-submenu index="-1" v-if="$store.state.account.isLogin && $store.state.account.user.type == 'admin'">
                         <template slot="title"><i class="fas fa-user-shield"></i>管理员</template>
                         <el-menu-item index="3"><i class="fad fa-subway"></i>车次管理</el-menu-item>
-                        <el-menu-item index="4"><i class="fad fa-credit-card-front"></i>订单管理</el-menu-item>
-                        <el-menu-item index="5"><i class="fas fa-user-cog"></i>用户管理</el-menu-item>
                     </el-submenu>
                     <div class="bottom">
                         <el-tooltip class="item" effect="dark" content="本项目 GitHub 仓库" placement="top">
@@ -130,7 +128,7 @@ export default {
     opacity: 0;
     padding: 0;
 }
-.page {
+.page-layout {
     height: 100%;
 }
 .sider {

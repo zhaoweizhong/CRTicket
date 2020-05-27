@@ -406,6 +406,7 @@ export default {
 
 <style lang="less" scoped>
 .page {
+    height: 100%;
     h1 {
         font-size: 20px;
         margin: 0 0 20px 0;

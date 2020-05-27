@@ -16,6 +16,7 @@
         "illuminate/redis": "^7.7",
         "laravel/framework": "^7.0",
         "laravel/tinker": "^2.0",
+        "overtrue/laravel-pinyin": "~4.0",
         "tymon/jwt-auth": "^1.0"
     },
     "require-dev": {
