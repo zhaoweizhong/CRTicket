@@ -10,8 +10,6 @@ import Passenger from './pages/Passenger'
 import Book from './pages/Book'
 import Order from './pages/Order'
 import AdminTrain from './pages/admin/Train'
-import AdminOrder from './pages/admin/Order'
-import AdminUser from './pages/admin/User'
 import ErrorPage from './pages/Error'
 
 Vue.use(VueRouter);
@@ -56,22 +54,6 @@ const routes = [
             {
                 path: '/admin/train',
                 component: AdminTrain,
-                meta: {
-                    requiresAuth: true,
-                    requiresAdmin: true
-                },
-            },
-            {
-                path: '/admin/order',
-                component: AdminOrder,
-                meta: {
-                    requiresAuth: true,
-                    requiresAdmin: true
-                },
-            },
-            {
-                path: '/admin/user',
-                component: AdminUser,
                 meta: {
                     requiresAuth: true,
                     requiresAdmin: true

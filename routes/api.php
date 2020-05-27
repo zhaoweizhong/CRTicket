@@ -75,4 +75,13 @@ Route::middleware('auth:api')->group(function() {
     Route::patch('/trains/{train}', 'TrainsController@update');
     // 删除列车
     Route::delete('/trains/{train}', 'TrainsController@delete');
+    /* 订单 */
+    // 查看我的订单
+    Route::get('/orders', 'OrdersController@index');
+    // 下订单
+    Route::post('/orders', 'OrdersController@store');
+    // 支付订单
+    Route::post('/orders/{order}/pay', 'OrdersController@pay');
+    // 取消订单
+    Route::delete('/orders/{order}', 'OrdersController@cancel');
 });

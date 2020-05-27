@@ -21,7 +21,7 @@ class TrainsController extends Controller
     }
 
     public function search(Request $request) {
-        $trains = Train::all();
+        $trains = Train::where('status', 1)->get();
 
         $depart_stations = [Station::find($request->depart_station)];
         $arrive_stations = [Station::find($request->arrive_station)];
@@ -35,13 +35,13 @@ class TrainsController extends Controller
             ])->setStatusCode(404);
         }
 
-        if ($city = $depart_stations[0]->city) {
-            $depart_stations = Station::where('city', $city)->where('status', 1)->get();
-        }
+        // if ($city = $depart_stations[0]->city) {
+        //     $depart_stations = Station::where('city', $city)->where('status', 1)->get();
+        // }
 
-        if ($city = $arrive_stations[0]->city) {
-            $arrive_stations = Station::where('city', $city)->where('status', 1)->get();
-        }
+        // if ($city = $arrive_stations[0]->city) {
+        //     $arrive_stations = Station::where('city', $city)->where('status', 1)->get();
+        // }
 
         $collection = [];
         $i = 0;
@@ -49,12 +49,13 @@ class TrainsController extends Controller
             foreach ($arrive_stations as $arrive_station) {
                 foreach ($trains as $train) {
                     if ($train->where('status', 1) && $train->stations()->where('station_id', $depart_station->id)->exists() && $train->stations()->where('station_id', $arrive_station->id)->exists()
-                        && $depart_station_num = $train->stations()->where('station_id', $depart_station->id)->first()->pivot->station_num < $arrive_station_num = $train->stations()->where('station_id', $arrive_station->id)->first()->pivot->station_num) {
+                        && (($depart_station_num = $train->stations()->where('station_id', $depart_station->id)->first()->pivot->station_num) < ($arrive_station_num = $train->stations()->where('station_id', $arrive_station->id)->first()->pivot->station_num))) {
                         $collection[$i] = $train;
                         $collection[$i]->seats_availability = Seat::getAvailableArray($train, $date, $depart_station, $arrive_station);
-                        $collection[$i]->depart_station_num = (int)$depart_station_num;
-                        $collection[$i]->arrive_station_num = (int)$arrive_station_num;
-                        $collection[$i]->stations = StationResource::collection($train->stations);
+                        $collection[$i]->depart_station_id = $depart_station->id;
+                        $collection[$i]->arrive_station_id = $arrive_station->id;
+                        $collection[$i]->depart_station_num = $depart_station_num;
+                        $collection[$i]->arrive_station_num = $arrive_station_num;
                         $i++;
                     }
                 }
@@ -64,7 +65,13 @@ class TrainsController extends Controller
         return TrainResource::collection(new Collection($collection));
     }
 
-    public function show(Train $train) {
+    public function show(Request $request, Train $train) {
+        if ($request->has('date') && $request->has('depart_station_id') && $request->has('arrive_station_id')) {
+            $date = $request->date;
+            $depart_station = Station::find($request->depart_station_id);
+            $arrive_station = Station::find($request->arrive_station_id);
+            $train->seats_availability = Seat::getAvailableArray($train, $date, $depart_station, $arrive_station);
+        }
         return new TrainResource($train);
     }
 
@@ -133,6 +140,49 @@ class TrainsController extends Controller
                 'message' => '您无权进行此操作'
             ])->setStatusCode(403);
         }
+
+        $this->validate($request, [
+            'stations' => 'required|string',
+            'train_numbers' => 'required|string',
+            'times' => 'required|string',
+            'prices' => 'required|json'
+        ]);
+
+        $train_numbers = json_decode($request->train_numbers);
+
+        $new_train = Train::create([
+            'numbers' => json_encode(array_unique($train_numbers)),
+            'price'   => stripslashes(json_encode(json_decode($request->prices)))
+        ]);
+
+        $stations = json_decode($request->stations);
+
+        foreach ($stations as $station) {
+            if (!Station::find($station)->status) {
+                return response()->json([
+                    'status_code' => 404,
+                    'message' => '车站不存在'
+                ])->setStatusCode(404);
+            }
+        }
+
+        $pivots = array();
+        for ($i=0; $i < count($stations); $i++) { 
+            $pivots[$i] = [
+                'station_num' => $i + 1,
+                'train_num'   => $train_numbers[$i],
+                'arrive_time' => json_decode($request->times)[$i][0],
+                'depart_time' => json_decode($request->times)[$i][1]
+            ];
+        }
+        $stations_pivots = array_combine($stations, $pivots);
+
+        $new_train->stations()->attach($stations_pivots);
+
+        $train->status = false;
+        $train->save();
+
+        return (new TrainResource($new_train))->response()->setStatusCode(200);
     }
 
     public function delete(Request $request, Train $train) {

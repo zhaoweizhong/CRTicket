@@ -16,7 +16,7 @@ class CreateTrainsTable extends Migration
         Schema::create('trains', function (Blueprint $table) {
             $table->id();
             $table->string('numbers'); // 数组：车次
-            $table->json('price'); // 三维数组：[出发站 => [到达站 => [座位类型 => 价格]]]
+            $table->string('price'); // 三维数组：[出发站 => [到达站 => [座位类型 => 价格]]]
             $table->boolean('status')->default(true); // 是否可用
             $table->timestamps();
         });

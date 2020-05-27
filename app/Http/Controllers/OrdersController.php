@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\OrderResource;
+use App\Http\Resources\PassengerResource;
+use App\Http\Resources\StationResource;
 use App\Http\Resources\TicketResource;
+use App\Http\Resources\TrainResource;
 use App\Models\Order;
 use App\Models\Passenger;
 use App\Models\Seat;
@@ -14,6 +17,11 @@ use Illuminate\Http\Request;
 
 class OrdersController extends Controller
 {
+    public function index(Request $request) {
+        $orders = $request->user()->orders;
+        return OrderResource::collection($orders);
+    }
+
     public function store(Request $request, Order $order) {
         $this->validate($request, [
             'train_id' => 'required|integer',
@@ -68,12 +76,50 @@ class OrdersController extends Controller
             'seat_type'          => $type,
             'carriage'           => $carriage,
             'seat'               => $seat,
-            'price'              => json_decode($train->price)[$depart_station_num][$arrive_station_num][$type]
+            'price'              => $train->price[$depart_station_num][$arrive_station_num][$type]
         ]);
+
+        $demand_sets_value = 0;
+        for ($i=$depart_station_num - 1; $i < $arrive_station_num - 1; $i++) { 
+            $demand_sets_value = $demand_sets_value + pow(2, $i);
+        }
+
+        $seat_m = $train->seats()->whereDate('date', $date)->first();
+        if (is_null($seat_m)) {
+            Seat::create([
+                'train_id' => $train->id,
+                'date' => $date,
+                'status' => json_encode([$carriage => [$seat => decbin($demand_sets_value)]]),
+            ]);
+        } else {
+            if (is_null(json_decode($seat_m->status, true)[$carriage])) {
+                $seat_m_decode = json_decode($seat_m->status, true);
+                $seat_m_decode[$carriage] = json_encode([$seat => decbin($demand_sets_value)]);
+                $seat_m->status = json_encode($seat_m_decode);
+                $seat_m->save();
+            } else {
+                $seat_status_carriage = json_decode($seat_m->status, true)[$carriage];
+                if (!isset($seat_status_carriage[$seat])) {
+                    $seat_m_decode = json_decode($seat_m->status, true);
+                    $seat_m_decode[$carriage][$seat]= decbin($demand_sets_value);
+                    $seat_m->status = json_encode($seat_m_decode);
+                    $seat_m->save();
+                } else {
+                    $seat_status_value = bindec(json_decode($seat_m->status, true)[$carriage][$seat]);
+                    $new_seat_status_value = $seat_status_value + $demand_sets_value;
+                    $seat_m_decode = json_decode($seat_m->status, true);
+                    $seat_m_decode[$carriage][$seat] = decbin($new_seat_status_value);
+                    $seat_m->status = json_encode($seat_m_decode);
+                    $seat_m->save();
+                }
+            }
+        }
 
         return [
             'order'  => new OrderResource($order),
-            'ticket' => new TicketResource($ticket)
+            'ticket' => new TicketResource($ticket),
+            'train' => new TrainResource($train),
+            'passenger' => new PassengerResource($passenger),
         ];
     }
     
@@ -109,7 +155,7 @@ class OrdersController extends Controller
             $arrive_station_num = $ticket->arrive_station_num;
             
             $demand_sets_value = 0;
-            for ($i=$depart_station_num; $i < $arrive_station_num; $i++) { 
+            for ($i=$depart_station_num - 1; $i < $arrive_station_num - 1; $i++) { 
                 $demand_sets_value = $demand_sets_value + pow(2, $i);
             }
 

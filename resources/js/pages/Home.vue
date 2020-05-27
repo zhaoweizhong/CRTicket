@@ -60,9 +60,9 @@
             </el-form-item>
         </el-form>
         <el-table :data="trains" height="100%" stripe border class="train-table" v-loading="isTrainsLoading">
-            <el-table-column prop="id_this" label="车次" width="70">
+            <el-table-column label="车次" width="70">
                 <template slot-scope="scope">
-                    {{JSON.parse(scope.row.numbers)[0]}}
+                    <span @click="openTimetableDialog(scope.row)">{{JSON.parse(scope.row.numbers)[0]}}</span>
                 </template>
             </el-table-column>
             <el-table-column width="100">
@@ -81,8 +81,8 @@
                     <span>到达时间</span>
                 </template>
                 <template slot-scope="scope">
-                    <span>{{$moment(scope.row.stations[scope.row.depart_station_num-1].pivot.depart_time, "HH:mm:ss").format('HH:mm')}}</span>
-                    <span>{{$moment(scope.row.stations[scope.row.arrive_station_num-1].pivot.arrive_time, "HH:mm:ss").format('HH:mm')}}</span>
+                    <span>{{scope.row.stations[scope.row.depart_station_num-1].pivot.depart_time ? ($moment(dataLeftCompleting(2,"0",getDays(scope.row.stations[scope.row.depart_station_num-1].pivot.depart_time.substr(0,2))[1])+scope.row.stations[scope.row.depart_station_num-1].pivot.depart_time.substr(2,), "HH:mm:ss").format('HH:mm')) : '-'}}{{scope.row.stations[scope.row.depart_station_num-1].pivot.depart_time ? (getDays(scope.row.stations[scope.row.depart_station_num-1].pivot.depart_time)[0] > 0 ? '（+'+getDays(scope.row.stations[scope.row.depart_station_num-1].pivot.depart_time.substr(0,2))[0]+'天）':'') : ''}}</span>
+                    <span>{{scope.row.stations[scope.row.arrive_station_num-1].pivot.arrive_time ? ($moment(dataLeftCompleting(2,"0",getDays(scope.row.stations[scope.row.arrive_station_num-1].pivot.arrive_time.substr(0,2))[1])+scope.row.stations[scope.row.arrive_station_num-1].pivot.arrive_time.substr(2,), "HH:mm:ss").format('HH:mm')) : '-'}}{{scope.row.stations[scope.row.depart_station_num-1].pivot.arrive_time ? (getDays(scope.row.stations[scope.row.depart_station_num-1].pivot.arrive_time)[0] > 0 ? '（+'+getDays(scope.row.stations[scope.row.depart_station_num-1].pivot.arrive_time.substr(0,2))[0]+'天）':'') : ''}}</span>
                 </template>
             </el-table-column>
             <el-table-column label="历时" width="70">
@@ -128,10 +128,42 @@
             </el-table-column>
             <el-table-column fixed="right" label="操作" width="100">
                 <template slot-scope="scope">
-                    <el-button type="success" size="mini">预订</el-button>
+                    <el-button type="success" size="mini" @click="router.push('/book?ti=' + scope.row.id + '&ds=' + scope.row.depart_station_id + '&as=' + scope.row.arrive_station_id + '&dt=' + searchForm.date)">预订</el-button>
                 </template>
             </el-table-column>
         </el-table>
+        <el-dialog :title="timetable.train_num + '次 时刻表'" :visible.sync="timetableDialogVisible" width="500px" class="timetable-dialog">
+            <el-table :data="timetable.stations" height="100%" stripe border class="timetable-table" header-cell-class-name="table-cell" cell-class-name="table-cell">
+                <el-table-column label="站序" width="61">
+                    <template slot-scope="scope">
+                        {{scope.row.pivot.station_num}}
+                    </template>
+                </el-table-column>
+                <el-table-column label="车站" width="101">
+                    <template slot-scope="scope">
+                        <span :style="(scope.row.pivot.station_num == timetable.depart_station_num || scope.row.pivot.station_num == timetable.arrive_station_num) ? 'font-weight: 600;' : ''">{{scope.row.name}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="到站时间" width="99">
+                    <template slot-scope="scope">
+                        <span :style="(scope.row.pivot.station_num == timetable.arrive_station_num) ? 'font-weight: 600;' : ''">{{scope.row.pivot.arrive_time ? $moment(dataLeftCompleting(2,"0",getDays(scope.row.pivot.arrive_time.substr(0,2))[1])+scope.row.pivot.arrive_time.substr(2,), "HH:mm:ss").format('HH:mm') : '-'}}{{scope.row.pivot.arrive_time ? (getDays(scope.row.pivot.arrive_time)[0] > 0 ? '（+'+getDays(scope.row.pivot.arrive_time.substr(0,2))[0]+'天）':'') : ''}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="出发时间" width="99">
+                    <template slot-scope="scope">
+                        <span :style="(scope.row.pivot.station_num == timetable.depart_station_num) ? 'font-weight: 600;' : ''">{{scope.row.pivot.depart_time ? $moment(dataLeftCompleting(2,"0",getDays(scope.row.pivot.depart_time.substr(0,2))[1])+scope.row.pivot.depart_time.substr(2,), "HH:mm:ss").format('HH:mm') : '-'}}{{scope.row.pivot.depart_time ? (getDays(scope.row.pivot.depart_time)[0] > 0 ? '（+'+getDays(scope.row.pivot.depart_time.substr(0,2))[0]+'天）':'') : ''}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="停留时间" width="99">
+                    <template slot-scope="scope">
+                        {{(scope.row.pivot.arrive_time && scope.row.pivot.depart_time) ? calcTimeDiff2(scope.row.pivot.depart_time,scope.row.pivot.arrive_time) : '-'}}
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div slot="footer" class="timetable-dialog-footer">
+                <el-button @click="timetableDialogVisible = false">关闭</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -166,17 +198,18 @@ export default {
                 ],
             },
             trains: [],
-            isTrainsLoading: false
+            isTrainsLoading: false,
+            timetableDialogVisible: false,
+            timetable: {
+                train_num: '',
+                depart_station_num: '',
+                arrive_station_num: '',
+                stations: []
+            }
         }
     },
     created() {
-        this.searchForm.departStation = 1
-        this.searchForm.arriveStation = 2
-        this.$nextTick(() => {
-            this.searchForm.date = '2020-05-29'
-            this.onSearch()
-            this.$emit('getTitle', '列车查询')
-        })
+        this.$emit('getTitle', '列车查询');
     },
     methods: {
         handleReverse() {
@@ -238,9 +271,34 @@ export default {
             })
         },
         calcTimeDiff(train) {
-            var departTime = this.$moment(train.stations[train.depart_station_num-1].pivot.depart_time, "HH:mm:ss")
-            var arriveTime = this.$moment(train.stations[train.arrive_station_num-1].pivot.arrive_time, "HH:mm:ss")
-            return this.$moment.tz(arriveTime - departTime, 'Africa/Abidjan').format('HH:mm')
+            var departTime = train.stations[0].pivot.depart_time
+            var arriveTime = train.stations[train.stations.length-1].pivot.arrive_time
+            var hour = parseInt(arriveTime.substr(0,2)) - parseInt(departTime.substr(0,2))
+            var min = parseInt(arriveTime.substr(3,5)) - parseInt(departTime.substr(3,5))
+            var totalMin = hour * 60 + min
+            return this.dataLeftCompleting(2,'0',Math.floor(totalMin/60)) + ':' + this.dataLeftCompleting(2,'0',(totalMin%60))
+        },
+        calcTimeDiff2(start, end) {
+            var departTime = end
+            var arriveTime = start
+            var hour = parseInt(arriveTime.substr(0,2)) - parseInt(departTime.substr(0,2))
+            var min = parseInt(arriveTime.substr(3,5)) - parseInt(departTime.substr(3,5))
+            var totalMin = hour * 60 + min
+            return this.dataLeftCompleting(2,'0',Math.floor(totalMin/60)) + ':' + this.dataLeftCompleting(2,'0',(totalMin%60))
+        },
+        dataLeftCompleting(bits, identifier, value) {
+            value = Array(bits + 1).join(identifier) + value;
+            return value.slice(-bits);
+        },
+        getDays(hours) {
+            return [parseInt(hours/24), hours%24]
+        },
+        openTimetableDialog(train) {
+            this.timetable.train_num = JSON.parse(train.numbers)[0]
+            this.timetable.depart_station_num = train.depart_station_num
+            this.timetable.arrive_station_num = train.arrive_station_num
+            this.timetable.stations = train.stations
+            this.timetableDialogVisible = true
         }
     },
 }
@@ -266,8 +324,18 @@ export default {
         left: 12px;
     }
 }
+.timetable-table,
 .train-table {
     th, td {
+        text-align: center;
+    }
+}
+.timetable-dialog {
+    .el-dialog__body {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    .timetable-dialog-footer {
         text-align: center;
     }
 }

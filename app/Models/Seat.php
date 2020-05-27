@@ -15,9 +15,12 @@ class Seat extends Model
     }
 
     public static function getAvailable(Train $train, $date, $type, Station $depart_station, Station $arrive_station) {
-        $tickets = $train->tickets()->whereDate('date', $date)->where('seat_type', $type)
-                    ->where('depart_station_num', '<=', $train->stations()->where('station_id', $depart_station->id)->first()->pivot->station_num)
-                    ->where('arrive_station_num', '>=', $train->stations()->where('station_id', $arrive_station->id)->first()->pivot->station_num);
+        $tickets_db_all = $train->tickets()->where('date', $date)->where('seat_type', $type);
+        $tickets_all = $tickets_db_all->count();
+        $tickets_left = $tickets_db_all->where('arrive_station_num', '<=', $train->stations()->where('station_id', $depart_station->id)->first()->pivot->station_num)->count();
+        $tickets_right = $tickets_db_all->where('depart_station_num', '>=', $train->stations()->where('station_id', $arrive_station->id)->first()->pivot->station_num)->count();
+        $tickets_sold = $tickets_all - $tickets_left - $tickets_right;
+
         $total_seats = [];
         if (substr(json_decode($train->numbers)[0],0,1) == 'G' || substr(json_decode($train->numbers)[0],0,1) == 'D') {
             $total_seats = Train::$DG_total;
@@ -27,7 +30,7 @@ class Seat extends Model
             $total_seats = Train::$Other_total;
         }
         $total = $total_seats[$type];
-        return $total - $tickets->count();
+        return $total - $tickets_sold;
     }
 
     public static function getAvailableArray(Train $train, $date, Station $depart_station, Station $arrive_station) {
@@ -61,16 +64,21 @@ class Seat extends Model
             $seats_num = Train::$Other_seats_num;
         }
 
+        $seat_m = $train->seats()->where('date', $date)->first();
         for ($carriage = 1; $carriage <= count($seats_num); $carriage++) {
             if (array_key_exists($type, $seats_num[$carriage - 1])) {
                 foreach ($seats_num[$carriage - 1][$type] as $seat) {
-                    if ($seat_m = $train->seats()->whereDate('date', $date)->first() == null) {
+                    if (is_null($seat_m)) {
                         return [$carriage, $seat];
                     } else {
-                        $seat_status = $seat_m->status;
+                        $seat_status_orig = json_decode($seat_m->status, true);
+                        if (!isset($seat_status_orig[$carriage][$seat])) {
+                            return [$carriage, $seat];
+                        }
+                        $seat_status = $seat_status_orig[$carriage][$seat];
                         // $digit_num = $train->stations()->count() - 1;
                         $demand_sets_value = 0;
-                        for ($i=$depart_station_num; $i < $arrive_station_num; $i++) { 
+                        for ($i=$depart_station_num - 1; $i < $arrive_station_num - 1; $i++) { 
                             $demand_sets_value = $demand_sets_value + pow(2, $i);
                         }
                         $seat_status_value = bindec($seat_status);
