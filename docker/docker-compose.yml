@@ -1,0 +1,32 @@
+version: "2"
+services:
+  crticket-nginx:
+    container_name: "crticket-nginx"
+    image: nginx:1.17.6-alpine
+    restart: always
+    depends_on:
+      - "crticket-php"
+    ports:
+      - "80:80"
+    volumes:
+      - /Users/zzw/Courses/Database/Project/docker:/etc/nginx/conf.d:cached
+      - /Users/zzw/Courses/Database/Project:/var/www:cached
+      - /Users/zzw/Docker Configs/crticket_logs:/var/log/nginx:cached
+    networks:
+      - crticket-webnet
+  crticket-php:
+    container_name: "crticket-php"
+    build:
+      context: .
+      dockerfile: Dockerfile-php
+    restart: always
+    command: /usr/local/bin/php /var/www/bin/laravels start -i
+    ports:
+      - "5201:5201"
+    volumes:
+      - /Users/zzw/Courses/Database/Project:/var/www:cached
+    networks:
+      - crticket-webnet
+networks:
+  crticket-webnet:
+    driver: bridge
